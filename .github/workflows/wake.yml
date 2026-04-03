@@ -11,7 +11,7 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping All 5 Spaces
+      - name: Ping All 4 Spaces
         run: |
           URLS=(
             "https://sidimadt-pro-snrt.hf.space"
