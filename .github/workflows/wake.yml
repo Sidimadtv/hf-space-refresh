@@ -17,8 +17,8 @@ jobs:
             "https://sidimadt-pro-snrt.hf.space"
             "https://sidimadt-pro-alkass.hf.space"
             "https://sidimadt-pro-ksa.hf.space"
-            "https://sidimadt-my-dubai-proxy.hf.space"
-            "https://sidimadt-pro-ssc.hf.space"
+            "https://sidimadt-pro-dubai.hf.space"
+           
           )
           for url in "${URLS[@]}"; do
             echo "Checking $url..."
