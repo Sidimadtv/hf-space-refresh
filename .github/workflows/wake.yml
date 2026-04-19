@@ -14,10 +14,11 @@ jobs:
       - name: Ping All 4 Spaces
         run: |
           URLS=(
-            "https://sidimadt-pro-snrt.hf.space"
-            "https://sidimadt-pro-alkass.hf.space"
-            "https://sidimadt-pro-ksa.hf.space"
-            "https://sidimadt-pro-dubai.hf.space"
+            "https://sidimadtv-pro-snrt.hf.space"
+            "https://sidimadtv-pro-alkass.hf.space"
+            "https://sidimadtv-pro-ksa.hf.space"
+            "https://sidimadtv-pro-dubai.hf.space"
+           "https://sidimadtv-cors-proxy.hf.space"
            
           )
           for url in "${URLS[@]}"; do
