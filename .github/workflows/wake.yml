@@ -20,7 +20,7 @@ jobs:
             "https://sidimadtv-pro-dubai.hf.space"
            "https://sidimadtv-cors-proxy.hf.space"
             "https://sidimadtv-cdrm.hf.space"
-            "https://sidimdd-cdrm.hf.space"
+            "https://bysidimad-cdrm.hf.space"
           )
           for url in "${URLS[@]}"; do
             echo "Checking $url..."
