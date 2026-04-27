@@ -11,7 +11,7 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping All 7 Spaces
+      - name: Ping All 8 Spaces
         run: |
           URLS=(
             "https://sidimadtv-pro-snrt.hf.space"
@@ -21,6 +21,8 @@ jobs:
            "https://sidimadtv-cors-proxy.hf.space"
             "https://sidimadtv-cdrm.hf.space"
             "https://bysidimad-cdrm.hf.space"
+        "https://sidim-mycdrm.hf.space"
+          
           )
           for url in "${URLS[@]}"; do
             echo "Checking $url..."
