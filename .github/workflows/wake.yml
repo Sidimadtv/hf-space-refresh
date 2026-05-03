@@ -2,16 +2,20 @@ name: Wake Up Sports Spaces
 
 on:
   schedule:
-    # Runs every 3 hours (00:00, 03:00, 06:00, etc.)
     - cron: '0 */3 * * *'
-  # Allows you to trigger it manually from the GitHub Actions tab
   workflow_dispatch:
+
+permissions:
+  contents: write  # Crucial: This allows the bot to commit changes
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping All 9 Spaces
+      - name: Checkout Code
+        uses: actions/checkout@v4 # Gets your files so it can update them
+
+      - name: Ping Spaces
         run: |
           URLS=(
             "https://sidimadtv-pro-snrt.hf.space"
@@ -25,7 +29,19 @@ jobs:
             "https://sidim-core-proxy.hf.space"
           )
           for url in "${URLS[@]}"; do
-            echo "Checking $url..."
-            # -I fetches headers only (fast), -s is silent, head -n 1 shows the status code
-            curl -Is "$url" | head -n 1
+            echo "Pinging: $url"
+            curl -o /dev/null -s -w "%{http_code}" -L --max-time 10 "$url"
           done
+
+      - name: Keep Alive (Prevent 60-day pause)
+        run: |
+          date > heartbeat.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add heartbeat.txt
+          git commit -m "Keep-alive: $(date)" || echo "No changes to commit"
+          git push
+
+
+
+
