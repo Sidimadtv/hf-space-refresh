@@ -18,7 +18,7 @@ jobs:
       - name: Ping and Build Dashboard
         run: |
           URLS=(
-            "https://sidimadtv-pro-snrt.hf.space"
+             "https://sidimadtv-pro-snrt.hf.space"
             "https://sidimadtv-pro-alkass.hf.space"
             "https://sidimadtv-pro-ksa.hf.space"
             "https://sidimadtv-pro-dubai.hf.space"
@@ -29,36 +29,46 @@ jobs:
             "https://sidim-core-proxy.hf.space"
           )
           
-          # Create HTML structure
+          # Start HTML
           echo "<html><head><title>Spaces Status</title>" > index.html
           echo "<meta name='viewport' content='width=device-width, initial-scale=1'>" >> index.html
+          # Auto-refresh the page every 300 seconds (5 mins)
+          echo "<meta http-equiv='refresh' content='300'>" >> index.html
           echo "<style>
             body{font-family:-apple-system,sans-serif; background:#0f172a; color:white; text-align:center; padding:20px;}
             .grid{display:flex; flex-wrap:wrap; justify-content:center; gap:15px; margin-top:20px;}
-            .card{background:#1e293b; padding:20px; border-radius:12px; width:280px; border:1px solid #334155;}
-            .online{color:#4ade80; font-weight:bold;}
-            .offline{color:#f87171; font-weight:bold;}
-            .url{font-size:0.8em; color:#94a3b8; word-break:break-all;}
+            .card{background:#1e293b; padding:20px; border-radius:12px; width:280px; border:1px solid #334155; transition: 0.3s;}
+            .card:hover{border-color: #38bdf8;}
+            .online{color:#4ade80; font-weight:bold; display:block; margin-bottom:10px;}
+            .offline{color:#f87171; font-weight:bold; display:block; margin-bottom:10px;}
+            .url{font-size:0.8em; color:#94a3b8; word-break:break-all; margin-bottom:15px;}
+            .btn{display:inline-block; background:#38bdf8; color:#0f172a; padding:8px 15px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:0.8em;}
+            .btn:hover{background:#7dd3fc;}
             .time{color:#64748b; font-size:0.9em;}
           </style>" >> index.html
           echo "</head><body>" >> index.html
           echo "<h1>🚀 Spaces Monitor</h1>" >> index.html
-          echo "<p class='time'>Last heartbeat: $(date)</p>" >> index.html
+          echo "<p class='time'>Last Global Update: $(date)</p>" >> index.html
           echo "<div class='grid'>" >> index.html
 
           for url in "${URLS[@]}"; do
+            # Get HTTP status and response time
             STATUS=$(curl -o /dev/null -s -w "%{http_code}" -L --max-time 10 "$url")
             
+            echo "<div class='card'>" >> index.html
             if [ "$STATUS" = "200" ] || [ "$STATUS" = "301" ] || [ "$STATUS" = "302" ]; then
-              echo "<div class='card'><span class='online'>● ONLINE</span><br><div class='url'>$url</div></div>" >> index.html
+              echo "<span class='online'>● ONLINE ($STATUS)</span>" >> index.html
             else
-              echo "<div class='card'><span class='offline'>○ OFFLINE ($STATUS)</span><br><div class='url'>$url</div></div>" >> index.html
+              echo "<span class='offline'>○ OFFLINE ($STATUS)</span>" >> index.html
             fi
+            echo "<div class='url'>$url</div>" >> index.html
+            # The "Manual Handshake" button
+            echo "<a href='$url' target='_blank' class='btn'>Manual Handshake 🤝</a>" >> index.html
+            echo "</div>" >> index.html
           done
 
-          echo "</div></body></html>" >> index.html
+          echo "</div><p style='margin-top:40px; color:#475569;'>Page auto-refreshes every 5 mins</p></body></html>" >> index.html
           
-          # Update heartbeat.txt too
           date > heartbeat.txt
 
       - name: Deploy and Keep Alive
@@ -66,7 +76,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html heartbeat.txt
-          git commit -m "Heartbeat & Dashboard Update: $(date)" || echo "No changes"
+          git commit -m "Dashboard: Handshake links added $(date)" || echo "No changes"
           git push
 
 
