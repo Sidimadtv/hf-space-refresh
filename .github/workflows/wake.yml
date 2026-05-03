@@ -18,7 +18,7 @@ jobs:
       - name: Ping and Build Dashboard
         run: |
           URLS=(
-             "https://sidimadtv-pro-snrt.hf.space"
+            "https://sidimadtv-pro-snrt.hf.space"
             "https://sidimadtv-pro-alkass.hf.space"
             "https://sidimadtv-pro-ksa.hf.space"
             "https://sidimadtv-pro-dubai.hf.space"
@@ -29,10 +29,11 @@ jobs:
             "https://sidim-core-proxy.hf.space"
           )
           
-
-# Capture the timestamp of the actual run
-          LAST_RUN=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
-
+          # Force the timezone to Morocco/Casablanca for the dashboard display
+          export TZ='Africa/Casablanca'
+          LOCAL_TIME=$(date +"%Y-%m-%d %I:%M:%S %p")
+          UTC_TIME=$(date -u +"%H:%M UTC")
+          
           # Start HTML
           echo "<html><head><title>Spaces Status</title>" > index.html
           echo "<meta name='viewport' content='width=device-width, initial-scale=1'>" >> index.html
@@ -40,20 +41,28 @@ jobs:
           echo "<style>
             body{font-family:-apple-system,sans-serif; background:#0f172a; color:white; text-align:center; padding:20px;}
             .grid{display:flex; flex-wrap:wrap; justify-content:center; gap:15px; margin-top:20px;}
-            .card{background:#1e293b; padding:20px; border-radius:12px; width:280px; border:1px solid #334155;}
+            .card{background:#1e293b; padding:20px; border-radius:12px; width:280px; border:1px solid #334155; transition: 0.3s;}
+            .card:hover{border-color: #38bdf8;}
             .online{color:#4ade80; font-weight:bold; display:block; margin-bottom:10px;}
             .offline{color:#f87171; font-weight:bold; display:block; margin-bottom:10px;}
-            .url{font-size:0.8em; color:#94a3b8; word-break:break-all; margin-bottom:15px;}
+            .url{font-size:0.8em; color:#94a3b8; word-break:break-all; margin-bottom:15px; height: 35px; overflow: hidden;}
             .btn{display:inline-block; background:#38bdf8; color:#0f172a; padding:8px 15px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:0.8em;}
-            .timestamp-box{background:#334155; padding:10px; border-radius:8px; display:inline-block; margin-top:10px; border:1px dashed #64748b;}
+            
+            .heart-box{background:#1e293b; padding:15px; border-radius:50px; display:inline-flex; align-items:center; border:2px solid #ef4444; margin-bottom: 20px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);}
+            .heart {color: #ef4444; font-size: 1.5em; margin-right: 10px; animation: beat .8s infinite alternate;}
+            @keyframes beat { to { transform: scale(1.1); } }
+            .time-value{color:#ffffff; font-size:1.1em; font-weight:bold;}
+            .utc-small{font-size:0.7em; color:#64748b; margin-top:4px;}
           </style>" >> index.html
           echo "</head><body>" >> index.html
           echo "<h1>🚀 Spaces Monitor</h1>" >> index.html
           
-          # Display the Last Run Timestamp clearly
-          echo "<div class='timestamp-box'>" >> index.html
-          echo "<span style='color:#94a3b8'>Last Ping Execution:</span><br>" >> index.html
-          echo "<strong style='color:#facc15; font-size:1.2em;'>$LAST_RUN</strong>" >> index.html
+          # Updated Heartbeat Box with Local Time
+          echo "<div class='heart-box'>" >> index.html
+          echo "<span class='heart'>❤️</span>" >> index.html
+          echo "<div><span style='font-size:0.7em; color:#94a3b8; display:block;'>LAST REFRESH</span>" >> index.html
+          echo "<span class='time-value'>$LOCAL_TIME</span>" >> index.html
+          echo "<span class='utc-small'>($UTC_TIME)</span></div>" >> index.html
           echo "</div>" >> index.html
 
           echo "<div class='grid'>" >> index.html
@@ -71,18 +80,20 @@ jobs:
             echo "</div>" >> index.html
           done
 
-          echo "</div></body></html>" >> index.html
+          echo "</div><p style='margin-top:40px; color:#475569;'>Check heartbeat.txt for raw logs</p></body></html>" >> index.html
           
-          
-          date > heartbeat.txt
+          # This writes the exact time to the file for GitHub to see a change
+          echo "Last Ping: $LOCAL_TIME" > heartbeat.txt
 
       - name: Deploy and Keep Alive
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add index.html heartbeat.txt
-          git commit -m "Dashboard: Handshake links added $(date)" || echo "No changes"
+          # The commit message will also show the time in the GitHub history
+          git commit -m "Refresh: $(date)" || echo "No changes"
           git push
+
 
 
 
